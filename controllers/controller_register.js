@@ -23,7 +23,7 @@ try{
                                 console.log(hash)
                              }
                              else{
-                                res.status(422).json({message:"data inserted successfully"})
+                                res.status(422).json({message:err})
                              }
                          });
                         

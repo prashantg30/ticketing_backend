@@ -37,22 +37,24 @@ const login = async (req,res,next) =>{
     //         token:theToken
     //     });
 
-    await conn.query(`select email from  user where email ='${req.body.email}'`,(err,result, Failed
-        )=>{
-            if(result.length == 1){
-              console.log("ok")
-            }else{
-                console.log("no")
-                return res.status(422).json({
-                              message: "Invalid email address"
-                            });
+    await conn.query(`select * from  user where email ='${req.body.email}'`,(err,result, Failed
+        )=>{console.log(result)
+            if(result.length ===1 ){ 
+           const [row] = result
+          console.log(row.password)
+          console.log(req.body.password)
+          bcrypt.compare(req.body.password, row.password, (err, result)=> {
+          console.log(result)
+        });
+
+            }else {
+                return res.status(422).json({message: "Invalid email address"})
             }
         })
-    
-
     }
 catch(err){
         next(err);
+        console.log(err);
     }
 }
 module.exports = {login}
