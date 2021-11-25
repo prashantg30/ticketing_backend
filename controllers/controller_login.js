@@ -39,14 +39,15 @@ const login = async (req,res,next) =>{
           }
         });
 
-            }else {
+        }
+            else {
                 return res.status(422).json({message: "Invalid email address"})
             }
         })
     }
 catch(err){
         next(err);
-        console.log(err);
+        // console.log(err);
     }
 }
 module.exports = {login}
