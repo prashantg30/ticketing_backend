@@ -7,27 +7,32 @@ const error = validationResult(req)
 if(!error.isEmpty()){
     return res.status(422).json({error: error.array()});
 }
-try{
-
-    const row = await conn.query(
-        "select email from user where email = ?",
-        [req.body.email]
-    );
-    console.log(row);
-    if(row.length > 0){
+try{ 
+  await conn.query(`select email from  user where email ='${req.body.email}'`,(err,result, Failed
+    )=>{
+    if(result.length == 1){
         return res.status(201).json({message:"Email is already in use",});
+    }else{
+        bcrypt.hash(req.body.password, 12, function(err, hash) {
+            conn.query(
+                   `insert into user (name, email, password) values('${req.body.name}','${ req.body.email}','${hash}')`,(err, result)=>{
+                       console.log(result)
+                             if(!err){
+                                res.status(201).json({message:"data inserted successfully"})
+                                console.log("data inserted successfully")
+                                console.log(hash)
+                             }
+                             else{
+                                res.status(422).json({message:"data inserted successfully"})
+                             }
+                         });
+                        
+        });
+       
     }
-    const hashpass = await bcrypt.hash(req.body.password,12);
-    const rows  = await conn.query(
-        'insert into user (name, email, password) values(?,?,?)',[
-          req.body.name,
-          req.body.email,
-          hashpass
-        ]);
-        if(rows.effectedRows==1){
-            res.status(201).json({message:"data inserted successfully"})
-        }
 
+  }
+  )
 }catch(err){
     next(err);
 }
