@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
-const conn = require('../Db')
+const conn = require('../db')
 const {validationResult} = require('express-validator')
 //login authentecation
 const login = async (req,res,next) =>{
