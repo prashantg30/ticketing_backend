@@ -13,14 +13,16 @@ const login = async (req, res, next)=>{
   try{
     const email = req.body.email
     const password = req.body.password
-    await conn.query(`SELECT * FROM user WHERE email = '${email}'`, (err, result)=>{
+    await conn.query(`SELECT * FROM user WHERE email = '${email}'`,  async (err, result)=>{
       if(err) throw err;
       if(result.length > 0){
-        bcrypt.compare(password, result[0].password, (err, match)=>{
-          if(!err)
+      await bcrypt.compare(password, result[0].password, (err, match)=>{
+          if(match === true)
+         
           {
-            const id = result[0].id;
+            const id = result[0].id
             const token = jwt.sign({id}, 'theSuperStrongSecretPassword', {expiresIn: '1h'});
+           
             return res.json({token: token});
           }
           else{
@@ -29,16 +31,13 @@ const login = async (req, res, next)=>{
         });
       }
       else{
-            return  res.status(422).json({message: 'Email does not exist'});
+        res.status(422).json('Email does not exist');
       }
-    });
-
-
-  }
+  });
+}
   catch(err)
   {
     next(err);
   }
-
 }
 module.exports= login;
