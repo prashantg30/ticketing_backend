@@ -1,5 +1,5 @@
-const {register} = require('./controllers/controller_register');
-const {login} = require('./controllers/controller_login');
+const register = require('./controllers/controller_register');
+const login = require('./controllers/controller_login');
 // const {getUser}= require('./controllers/controller_getuser')
 const{send} =require('./controllers/reset_password')
 const {registerValidator, loginValidator, resetPassword} = require('./validator');
@@ -9,7 +9,7 @@ const express = require('express');
 const route = express.Router();
 
 
-    route.post('/register',registerValidator,register);
+    route.post('/register',registerValidator, register);
     route.post('/login', loginValidator, login);
     route.post('/send', resetPassword, send)
     // route.get('/getuser',getUser);

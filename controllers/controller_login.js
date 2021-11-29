@@ -1,53 +1,44 @@
-const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 const conn = require('../db')
 const {validationResult} = require('express-validator')
-//login authentecation
-const login = async (req,res,next) =>{
-    const errors = validationResult(req);
 
-    if(!errors.isEmpty()){
-        return res.status(422).json({ errors: errors.array() });
-    }
+const login = async (req, res, next)=>{
+  const error = validationResult(req);
 
-    try{
+  if(!error.isEmpty()){
+    return res.status(422).json({ error : error.array() });
+  }
 
-    await conn.query(`select * from  user where email ='${req.body.email}'`,(err, result)=>{
-            // console.log(result)
-            if(result.length ===1 )
-            { 
-                const [row] = result
-        //   console.log(row.password)
-        //   console.log(req.body.password)
-          bcrypt.compare(req.body.password, row.password, (err, result)=> {
-        //  console.log(result)
-          if(result === true)
+  try{
+    const email = req.body.email
+    const password = req.body.password
+    await conn.query(`SELECT * FROM user WHERE email = '${email}'`, (err, result)=>{
+      if(err) throw err;
+      if(result.length > 0){
+        bcrypt.compare(password, result[0].password, (err, match)=>{
+          if(!err)
           {
-              jwt.sign({id:row.id},'the-super-strong-secrect',{ expiresIn: '1h' },(err,result)=>{
-                if(!err)
-                {
-                    // console.log(result)
-                    return res.json({
-                             token:result
-                         });
-                }
-            });
+            const id = result[0].id;
+            const token = jwt.sign({id}, 'theSuperStrongSecretPassword', {expiresIn: '1h'});
+            return res.json({token: token});
           }
-          if(!result === true)
-          {
-            return res.status(422).json({ message: "Incorrect password",});
+          else{
+            return res.status(422).json({message:"Incorrect Password"});
           }
         });
+      }
+      else{
+            return  res.status(422).json({message: 'Email does not exist'});
+      }
+    });
 
-        }
-            else {
-                return res.status(422).json({message: "Invalid email address"})
-            }
-        })
-    }
-catch(err){
-        next(err);
-        // console.log(err);
-    }
+
+  }
+  catch(err)
+  {
+    next(err);
+  }
+
 }
-module.exports = {login}
+module.exports= login;

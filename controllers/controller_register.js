@@ -1,47 +1,43 @@
-const bcrypt = require('bcrypt');
-const conn = require('../db');
-const {validationResult} = require('express-validator');
+const bcrypt = require('bcrypt')
+const conn = require('../db')
+const {validationResult} = require('express-validator')
 
-const register = async (req,res,next)=>{
-const error = validationResult(req)
-if(!error.isEmpty()){
-    return res.status(422).json({error: error.array()});
-}
-try{ 
-  await conn.query(`select email from  user where email ='${req.body.email}'`,(result)=>
-  {
-    if(result.length == 1)
+const register = async(req, res, next) =>{
+    const error = validationResult(req)
+    if(!error.isEmpty())
     {
-        return res.status(201).json({message:"Email is already in use",});
+        return res.status(422).json({error: error.array()});
     }
-    else
-    {
-        bcrypt.hash(req.body.password, 12, function(hash) {
-            conn.query(
-                   `insert into user (name, email, password) values('${req.body.name}','${ req.body.email}','${hash}')`,(err, result)=>{
-                      //  console.log(result)
-                             if(!err){
-                                res.status(201).json({message:"data inserted successfully"})
-                                // console.log("data inserted successfully")
-                                // console.log(hash)
-                             }
-                             else{
-                                res.status(422).json({message:err})
-                             }
-                         });
-                        
+
+    try{
+
+        const name = req.body.name
+        const email = req.body.email
+        const password = req.body.password
+        await conn.query(`SELECT email FROM user WHERE email = '${email}'`, (err, result)=>{
+            if(err) throw err;
+            if(result.length == 1){
+                res.status(201).json({message:"Email is already registered with us"});
+            }
+            else{
+                const hash = bcrypt.hash(password, 12)
+                conn.query(`INSERT INTO user (name, email, password) VALUES('${name}', '${email}', '${hash}')`, (err, result)=>{
+                    if(!err){
+                        res.status(201).json({message:"Data inserted successfully"})
+                       return res.send(result);
+                    }
+                
+                    else{
+                        return res.status(422).json({error: error});
+                    }
+                });
+            }
+
         });
-       
     }
-
-  }
-  )
-}catch(err){
-    next(err);
-}
+    catch(err){
+        next(err);
+    }
 }
 
-
-
-
-module.exports= {register }
+module.exports= register;
