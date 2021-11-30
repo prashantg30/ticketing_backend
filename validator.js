@@ -33,8 +33,13 @@ const registerValidator =[
          .notEmpty()
          .escape()
          .trim()
-         .isEmail()
+         .isEmail(),
+        
      ]   
+     const convertPassword =[
+         body('newPass', "Password must be between 6 to 12 characters")
+         .notEmpty()
+         .isLength({ min: 6, max:12 })
+     ]
 
-
-        module.exports = {registerValidator,loginValidator , resetPassword}
+        module.exports = {registerValidator,loginValidator , resetPassword, convertPassword}

@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+require('dotenv').config();
 const conn = require('../db')
 const {validationResult} = require('express-validator')
 
@@ -21,7 +22,7 @@ const login = async (req, res, next)=>{
          
           {
             const id = result[0].id
-            const token = jwt.sign({id}, 'theSuperStrongSecretPassword', {expiresIn: '1h'});
+            const token = jwt.sign({id}, process.env.DB_SSP , {expiresIn: '1h'});
            
             return res.json({token: token});
           }
