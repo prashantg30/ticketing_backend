@@ -4,9 +4,6 @@ require("dotenv").config();
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
-// const express = require('express')
-// const mailOptions = express();
-// mailOptions.use(express.urlencoded({extended: true}));
 
 const forgotPassword = async (req, res, next) => {
   const error = validationResult(req);
@@ -74,10 +71,10 @@ const forgotPassword = async (req, res, next) => {
 };
 
 const changePassword = async(req, res, next)=>{
-  // const error = validationResult(req);
-  // if(!error.isEmpty()){
-  // return  res.status(422).json({error: error.array()});
-  // }
+  const error = validationResult(req);
+  if(!error.isEmpty()){
+  return  res.status(422).json({error: error.array()});
+  }
   try{
    
     const resetLink = req.body.resetLink
@@ -93,8 +90,8 @@ const changePassword = async(req, res, next)=>{
             return res.status(400).json({error:'User with this token does not exist'});
           }
           else{
-            const newPass =  await bcrypt.hash(newPass, 12)
-            conn.query(`UPDATE user SET password= '${newPass}' WHERE resetLink ='${resetLink}'`, async (err)=>{
+            const hashNewPass =  await bcrypt.hash(newPass, 12)
+            conn.query(`UPDATE user SET password= '${hashNewPass}' WHERE resetLink ='${resetLink}'`, async (err)=>{
               if(err){
                return  res.status(400).json({error:'reset password error'});
               }
