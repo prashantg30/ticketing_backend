@@ -25,7 +25,7 @@ const register = async(req, res, next) =>{
                 await conn.query(`INSERT INTO user (name, email, password) VALUES('${name}', '${email}', '${hash}')`, (err, match)=>{
                     if(!err){
                         res.status(201).json({message:"Data inserted successfully"})
-                       return res.send(match)
+                        return res.send(match)
                     }
                     
                     else{
